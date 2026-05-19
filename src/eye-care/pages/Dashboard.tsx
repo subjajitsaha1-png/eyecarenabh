@@ -12,6 +12,7 @@ import {
   Building2,
   Shield,
   Activity,
+  ClipboardList,
 } from "lucide-react";
 
 const chapterGradients: Record<string, string> = {
