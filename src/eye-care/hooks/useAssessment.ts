@@ -11,6 +11,24 @@ export interface ElementAssessment {
   assessedAt?: string;
 }
 
+export type NCStatus = "open" | "in-progress" | "closed";
+
+export interface InspectionNC {
+  id: string;
+  elementCode: string; // e.g. "AAC.1.a" — free text, may or may not match an internal element
+  elementText?: string;
+  ncDescription: string; // the actual NC as written by the NABH assessor
+  rootCause: string;
+  correctiveAction: string; // immediate fix
+  preventiveAction: string; // systemic fix to stop recurrence
+  responsiblePerson: string;
+  targetDate: string;
+  status: NCStatus;
+  raisedDate: string;
+  closedDate?: string;
+  assessmentType?: "pre-assessment" | "final" | "surveillance" | "re-accreditation";
+}
+
 export interface AssessmentSession {
   id: string;
   hospitalName: string;
@@ -23,6 +41,7 @@ export interface AssessmentSession {
   lastSavedAt: string;
   elements: Record<string, ElementAssessment>;
   notes: string;
+  inspectionNCs: InspectionNC[];
 }
 
 const STORAGE_KEY = "eye_care_nabh_assessment";
@@ -39,6 +58,7 @@ const defaultSession = (): AssessmentSession => ({
   lastSavedAt: new Date().toISOString(),
   elements: {},
   notes: "",
+  inspectionNCs: [],
 });
 
 const scoreFromStatus = (status: ComplianceStatus): number => {
@@ -54,7 +74,9 @@ export function useAssessment() {
   const [session, setSession] = useState<AssessmentSession>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : defaultSession();
+      if (!stored) return defaultSession();
+      const parsed = JSON.parse(stored);
+      return { ...defaultSession(), ...parsed, inspectionNCs: parsed.inspectionNCs || [] };
     } catch {
       return defaultSession();
     }
@@ -112,8 +134,50 @@ export function useAssessment() {
   }, []);
 
   const loadSession = useCallback((data: AssessmentSession) => {
-    setSession(data);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    const normalized = { ...defaultSession(), ...data, inspectionNCs: data.inspectionNCs || [] };
+    setSession(normalized);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+  }, []);
+
+  const addNC = useCallback(
+    (nc: Omit<InspectionNC, "id" | "raisedDate" | "status"> & { status?: NCStatus }) => {
+      const newNC: InspectionNC = {
+        id: crypto.randomUUID(),
+        raisedDate: new Date().toISOString(),
+        status: nc.status || "open",
+        ...nc,
+      };
+      setSession((prev) => ({ ...prev, inspectionNCs: [newNC, ...prev.inspectionNCs] }));
+      setIsDirty(true);
+      return newNC.id;
+    },
+    []
+  );
+
+  const updateNC = useCallback((id: string, data: Partial<InspectionNC>) => {
+    setSession((prev) => ({
+      ...prev,
+      inspectionNCs: prev.inspectionNCs.map((nc) => {
+        if (nc.id !== id) return nc;
+        const updated = { ...nc, ...data };
+        if (data.status === "closed" && nc.status !== "closed") {
+          updated.closedDate = new Date().toISOString();
+        }
+        if (data.status && data.status !== "closed") {
+          updated.closedDate = undefined;
+        }
+        return updated;
+      }),
+    }));
+    setIsDirty(true);
+  }, []);
+
+  const deleteNC = useCallback((id: string) => {
+    setSession((prev) => ({
+      ...prev,
+      inspectionNCs: prev.inspectionNCs.filter((nc) => nc.id !== id),
+    }));
+    setIsDirty(true);
   }, []);
 
   // Computed stats
@@ -220,5 +284,8 @@ export function useAssessment() {
     getOverallStats,
     getReadinessLevel,
     exportData,
+    addNC,
+    updateNC,
+    deleteNC,
   };
 }

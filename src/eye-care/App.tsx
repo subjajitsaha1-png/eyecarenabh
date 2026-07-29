@@ -4,9 +4,10 @@ import Dashboard from "./pages/Dashboard";
 import ChapterAssessment from "./pages/ChapterAssessment";
 import Reports from "./pages/Reports";
 import Setup from "./pages/Setup";
+import NCRegister from "./pages/NCRegister";
 import Layout from "./components/Layout";
 
-type Page = "dashboard" | "setup" | "assessment" | "reports";
+type Page = "dashboard" | "setup" | "assessment" | "reports" | "ncRegister";
 
 interface AppContextType {
   currentPage: Page;
@@ -42,6 +43,7 @@ export default function App() {
           <ChapterAssessment chapterId={selectedChapter} />
         )}
         {currentPage === "reports" && <Reports />}
+        {currentPage === "ncRegister" && <NCRegister />}
       </Layout>
     </AppContext.Provider>
   );
