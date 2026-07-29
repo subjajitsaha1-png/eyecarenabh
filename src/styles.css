@@ -85,6 +85,178 @@
   }
 }
 
+/* ------------------------------------------------------------------
+   Rainbow / aurora design layer
+   ------------------------------------------------------------------ */
+
+@keyframes rainbow-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes rainbow-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes rainbow-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(4%, 6%) scale(1.08); }
+  66% { transform: translate(-3%, -4%) scale(0.95); }
+}
+
+@keyframes rainbow-glow-pulse {
+  0%, 100% { opacity: 0.55; filter: blur(14px); }
+  50% { opacity: 1; filter: blur(20px); }
+}
+
+@keyframes rainbow-underline {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+:root {
+  --rainbow-gradient: linear-gradient(
+    90deg,
+    #ff5f6d, #ffc371, #f9f871, #6ee7b7, #38bdf8, #818cf8, #c084fc, #ff5f6d
+  );
+}
+
+.rainbow-ring {
+  position: relative;
+  isolation: isolate;
+}
+.rainbow-ring::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 0deg,
+    #ff5f6d, #ffc371, #f9f871, #6ee7b7, #38bdf8, #818cf8, #c084fc, #ff5f6d
+  );
+  animation: rainbow-spin 4s linear infinite;
+  z-index: -1;
+}
+.rainbow-ring::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 0deg,
+    #ff5f6d, #ffc371, #f9f871, #6ee7b7, #38bdf8, #818cf8, #c084fc, #ff5f6d
+  );
+  filter: blur(10px);
+  opacity: 0.7;
+  animation: rainbow-spin 4s linear infinite, rainbow-glow-pulse 3s ease-in-out infinite;
+  z-index: -2;
+}
+
+.rainbow-text {
+  background: var(--rainbow-gradient);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: rainbow-flow 6s ease infinite;
+}
+
+.rainbow-bar {
+  background: var(--rainbow-gradient);
+  background-size: 300% 100%;
+  animation: rainbow-flow 4s ease infinite;
+}
+
+.rainbow-active {
+  position: relative;
+  background: linear-gradient(90deg, rgba(56,189,248,0.18), rgba(129,140,248,0.18), rgba(192,132,252,0.18));
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+.rainbow-active::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--rainbow-gradient);
+  background-size: 300% 100%;
+  animation: rainbow-flow 5s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.rainbow-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.rainbow-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255,255,255,0.16) 40%,
+    rgba(255,255,255,0.16) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: rainbow-shimmer 2.6s linear infinite;
+  pointer-events: none;
+}
+
+.aurora-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  animation: aurora-drift 14s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+.aurora-blob.b1 { width: 220px; height: 220px; top: -60px; left: -60px; background: #38bdf8; animation-duration: 16s; }
+.aurora-blob.b2 { width: 260px; height: 260px; top: 30%; right: -90px; background: #c084fc; animation-duration: 19s; animation-delay: -4s; }
+.aurora-blob.b3 { width: 200px; height: 200px; bottom: -60px; left: 20%; background: #34d399; animation-duration: 22s; animation-delay: -9s; }
+.aurora-blob.b4 { width: 180px; height: 180px; bottom: 10%; right: 10%; background: #fb7185; animation-duration: 17s; animation-delay: -6s; }
+
+.rainbow-underline {
+  height: 3px;
+  width: 100%;
+  border-radius: 999px;
+  background: var(--rainbow-gradient);
+  background-size: 300% 100%;
+  animation: rainbow-underline 3s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rainbow-ring::before,
+  .rainbow-ring::after,
+  .rainbow-text,
+  .rainbow-bar,
+  .rainbow-active::before,
+  .rainbow-shimmer::after,
+  .aurora-blob,
+  .rainbow-underline {
+    animation: none !important;
+  }
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
 
 body {

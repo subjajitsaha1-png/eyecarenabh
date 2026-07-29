@@ -65,15 +65,25 @@ export default function Layout({ children }: { children: ReactNode }) {
   };
 
   const Sidebar = () => (
-    <div className="flex flex-col h-full bg-[#0f172a] text-white">
+    <div className="relative flex flex-col h-full bg-[#0f172a] text-white overflow-hidden">
+      {/* Ambient aurora background */}
+      <div className="aurora-bg">
+        <div className="aurora-blob b1" />
+        <div className="aurora-blob b2" />
+        <div className="aurora-blob b3" />
+        <div className="aurora-blob b4" />
+      </div>
+
       {/* Logo */}
-      <div className="px-5 py-6 border-b border-white/10">
+      <div className="relative z-10 px-5 py-6 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/40">
-            <Eye className="w-5 h-5 text-white" />
+          <div className="rainbow-ring w-9 h-9 rounded-xl">
+            <div className="w-9 h-9 rounded-xl bg-[#0f172a] flex items-center justify-center">
+              <Eye className="w-5 h-5 text-white" />
+            </div>
           </div>
           <div>
-            <div className="font-bold text-sm leading-tight tracking-wide">EyeCare NABH</div>
+            <div className="rainbow-text font-extrabold text-sm leading-tight tracking-wide">EyeCare NABH</div>
             <div className="text-[10px] text-blue-300/70 tracking-widest uppercase">Assessment Portal</div>
           </div>
         </div>
@@ -81,7 +91,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       {/* Readiness Badge */}
       {stats.assessedElements > 0 && (
-        <div className="mx-4 mt-4 mb-1 rounded-xl bg-white/5 border border-white/10 px-4 py-3">
+        <div className="relative z-10 mx-4 mt-4 mb-1 rounded-xl bg-white/5 border border-white/10 px-4 py-3 backdrop-blur-sm">
           <div className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Readiness Status</div>
           <div className={`text-xs font-semibold px-2 py-0.5 rounded-full inline-block ${readinessColors[readiness.color]}`}>
             {readiness.level}
@@ -89,7 +99,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           <div className="mt-2 text-xs text-white/50">{stats.completionPercentage}% complete • {stats.overallPercentage}% score</div>
           <div className="mt-2 h-1.5 bg-white/10 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-sky-400 to-blue-500 rounded-full transition-all duration-500"
+              className="rainbow-bar h-full rounded-full transition-all duration-500"
               style={{ width: `${stats.completionPercentage}%` }}
             />
           </div>
@@ -97,12 +107,12 @@ export default function Layout({ children }: { children: ReactNode }) {
       )}
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+      <nav className="relative z-10 flex-1 overflow-y-auto px-3 py-3 space-y-1">
         <button
           onClick={() => { navigate("dashboard"); setSidebarOpen(false); }}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
             currentPage === "dashboard"
-              ? "bg-blue-600/30 text-blue-300 border border-blue-500/30"
+              ? "rainbow-active text-white"
               : "text-white/60 hover:text-white hover:bg-white/5"
           }`}
         >
@@ -114,7 +124,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           onClick={() => { navigate("setup"); setSidebarOpen(false); }}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
             currentPage === "setup"
-              ? "bg-blue-600/30 text-blue-300 border border-blue-500/30"
+              ? "rainbow-active text-white"
               : "text-white/60 hover:text-white hover:bg-white/5"
           }`}
         >
@@ -143,11 +153,11 @@ export default function Layout({ children }: { children: ReactNode }) {
                     onClick={() => { navigate("assessment", ch.id); setSidebarOpen(false); }}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-all group ${
                       isSelected
-                        ? "bg-blue-600/30 text-blue-300 border border-blue-500/30"
+                        ? "rainbow-active text-white"
                         : "text-white/50 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${chapterColors[ch.id]}`} />
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${chapterColors[ch.id]} ${isSelected ? "shadow-[0_0_8px_2px] shadow-current" : ""}`} />
                     <span className="flex-1 text-left truncate font-medium">{ch.code}</span>
                     {progress.assessed > 0 && (
                       <span className="text-[10px] opacity-60">
@@ -165,7 +175,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           onClick={() => { navigate("reports"); setSidebarOpen(false); }}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
             currentPage === "reports"
-              ? "bg-blue-600/30 text-blue-300 border border-blue-500/30"
+              ? "rainbow-active text-white"
               : "text-white/60 hover:text-white hover:bg-white/5"
           }`}
         >
@@ -175,17 +185,17 @@ export default function Layout({ children }: { children: ReactNode }) {
       </nav>
 
       {/* Actions */}
-      <div className="px-3 py-4 border-t border-white/10 space-y-2">
+      <div className="relative z-10 px-3 py-4 border-t border-white/10 space-y-2">
         <button
           onClick={assessment.exportData}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-white/50 hover:text-white hover:bg-white/5 transition-all"
+          className="rainbow-shimmer w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-white/50 hover:text-white hover:bg-white/5 transition-all"
         >
           <Download className="w-3.5 h-3.5" />
           Export Assessment
         </button>
         <button
           onClick={handleImport}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-white/50 hover:text-white hover:bg-white/5 transition-all"
+          className="rainbow-shimmer w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-white/50 hover:text-white hover:bg-white/5 transition-all"
         >
           <Upload className="w-3.5 h-3.5" />
           Import Assessment
@@ -217,7 +227,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       {/* Main */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile Header */}
-        <div className="lg:hidden flex items-center gap-3 px-4 py-3 bg-[#0f172a] border-b border-white/10">
+        <div className="relative lg:hidden flex items-center gap-3 px-4 py-3 bg-[#0f172a] border-b border-white/10 overflow-hidden">
           <button
             onClick={() => setSidebarOpen(true)}
             className="text-white/70 hover:text-white"
@@ -225,9 +235,14 @@ export default function Layout({ children }: { children: ReactNode }) {
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <Eye className="w-5 h-5 text-sky-400" />
-            <span className="text-white font-semibold text-sm">EyeCare NABH</span>
+            <div className="rainbow-ring w-7 h-7 rounded-lg">
+              <div className="w-7 h-7 rounded-lg bg-[#0f172a] flex items-center justify-center">
+                <Eye className="w-4 h-4 text-white" />
+              </div>
+            </div>
+            <span className="rainbow-text font-bold text-sm">EyeCare NABH</span>
           </div>
+          <div className="absolute bottom-0 left-0 right-0 rainbow-underline" />
         </div>
 
         {/* Page Content */}
