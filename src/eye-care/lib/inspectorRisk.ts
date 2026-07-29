@@ -18,59 +18,33 @@ export function getInterpretationRiskSignals(interpretation: string): RiskSignal
   const text = interpretation.toLowerCase();
   const signals: RiskSignal[] = [];
 
-  if (text.includes("direct questioning") || text.includes("interview")) {
+  // Only the narrow, specific patterns below are used. Broad boilerplate phrases
+  // like "interview", "direct observation", "point of care", or "embedded in
+  // routine operations" appear in the assessment-approach text of nearly every
+  // element, so keying off them flagged almost everything and added noise.
+  // Keeping only the rarer, more distinctive phrases keeps the signal meaningful.
+
+  if (text.includes("direct questioning")) {
     signals.push({
       tag: "Staff Interview",
       message:
-        "Assessor is likely to question frontline staff directly. Brief the team — if staff can't repeat the process in their own words, it's scored as a gap even with perfect paperwork.",
+        "Assessor is likely to question frontline staff directly on this point. Brief the team — if staff can't repeat the process in their own words, it's scored as a gap even with perfect paperwork.",
     });
   }
 
-  if (text.includes("direct observation") || text.includes("point of care")) {
-    signals.push({
-      tag: "Walk-through Check",
-      message:
-        "Verified by observing actual practice at the point of care, not just the file. Do a dry-run walk-through before the visit.",
-    });
-  }
-
-  if (text.includes("sample of patient") || text.includes("records or registers") || text.includes("sample of applicable cases")) {
+  if (text.includes("sample of applicable cases")) {
     signals.push({
       tag: "Random Record Pull",
       message:
-        "Assessor typically pulls a random sample of records/registers. Keep a ready, cleaned sample folder — don't rely on cherry-picked 'best' files.",
+        "Assessor pulls a random sample of applicable cases/records. Keep a ready, cleaned sample folder — don't rely on cherry-picked 'best' files.",
     });
   }
 
-  if (text.includes("display") || text.includes("signage")) {
+  if (text.includes("signage")) {
     signals.push({
       tag: "Display / Signage",
       message:
-        "Physical display or signage is checked for visibility, currency, and bilingual content. A stale or missing board is an easy, visible non-conformity.",
-    });
-  }
-
-  if (text.includes("training") || text.includes("orientation") || text.includes("competency assessment")) {
-    signals.push({
-      tag: "Training Records",
-      message:
-        "Attendance sheets and competency records are checked, not just the training calendar. Confirm every named staff member actually has a signed record on file.",
-    });
-  }
-
-  if (text.includes("calibration") || text.includes("maintenance")) {
-    signals.push({
-      tag: "Equipment Records",
-      message:
-        "Maintenance/calibration logs are checked against actual equipment tags in the room. Mismatched or overdue dates are a common, quick catch.",
-    });
-  }
-
-  if (text.includes("embedded in routine operations") || text.includes("not merely introduced for the assessment visit")) {
-    signals.push({
-      tag: "Routine, Not Rehearsed",
-      message:
-        "Assessor is trained to probe whether this is everyday practice or something set up just for the visit. Dates, versions, and staff answers should be consistent, not suspiciously fresh.",
+        "Physical signage is checked for visibility, currency, and bilingual content. A stale or missing board is an easy, visible non-conformity.",
     });
   }
 
