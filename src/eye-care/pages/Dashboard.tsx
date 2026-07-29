@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { useApp } from "../App";
 import { chapters } from "../data/standards";
 import { isHighRiskElement } from "../lib/inspectorRisk";
@@ -342,6 +343,3 @@ function LegendItem({ color, label, count }: { color: string; label: string; cou
     </div>
   );
 }
-
-// Add ReactNode to imports
-import { ReactNode } from "react";

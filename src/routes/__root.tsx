@@ -72,18 +72,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Unzip & Deploy automates the extraction and deployment of project files." },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Unzip & Deploy automates the extraction and deployment of project files." },
+      { title: "EyeCare NABH — Assessment Portal" },
+      { name: "description", content: "NABH Accreditation Readiness Assessment for Eye Care Organisations — 2nd Edition (Effective Jan 2026)." },
+      { name: "author", content: "LV Prasad Eye Institute" },
+      { property: "og:title", content: "EyeCare NABH — Assessment Portal" },
+      { property: "og:description", content: "NABH Accreditation Readiness Assessment for Eye Care Organisations — 2nd Edition (Effective Jan 2026)." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "Unzip & Deploy automates the extraction and deployment of project files." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d3ff59db-9cec-4e30-be70-38afd36b7f73/id-preview-51b20a88--054451ad-2670-41eb-9ded-3711105f5593.lovable.app-1779207197664.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d3ff59db-9cec-4e30-be70-38afd36b7f73/id-preview-51b20a88--054451ad-2670-41eb-9ded-3711105f5593.lovable.app-1779207197664.png" },
     ],
     links: [
       {

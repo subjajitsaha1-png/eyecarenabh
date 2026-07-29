@@ -1,6 +1,5 @@
 import { useApp } from "../App";
-import { chapters, Category } from "../data/standards";
-import { ComplianceStatus } from "../data/standards";
+import { chapters, Category, ComplianceStatus } from "../data/standards";
 import {
   BarChart3,
   Download,

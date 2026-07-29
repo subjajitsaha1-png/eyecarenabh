@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useApp } from "../App";
-import { chapters, Standard, ObjectiveElement, Category } from "../data/standards";
-import { ComplianceStatus } from "../data/standards";
+import { chapters, Standard, ObjectiveElement, Category, ComplianceStatus } from "../data/standards";
 import {
   ChevronDown,
   ChevronRight,
