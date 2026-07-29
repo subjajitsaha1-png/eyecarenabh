@@ -16,7 +16,13 @@ import {
   ChevronRightIcon,
   BookOpen,
   AlertTriangle,
+  ShieldAlert,
 } from "lucide-react";
+import {
+  getInterpretationRiskSignals,
+  getSelfAssessmentRiskSignals,
+  isHighRiskElement,
+} from "../lib/inspectorRisk";
 
 const categoryConfig: Record<Category, { label: string; color: string; bg: string; border: string; description: string }> = {
   CORE: {
@@ -101,6 +107,10 @@ function ElementCard({ element, filterCategory, filterStatus }: ElementCardProps
   const currentStatus: ComplianceStatus = elAssessment?.status || "not-assessed";
   const catConfig = categoryConfig[element.category];
   const statusCfg = statusConfig[currentStatus];
+  const interpSignals = getInterpretationRiskSignals(element.interpretation);
+  const selfSignals = getSelfAssessmentRiskSignals(elAssessment);
+  const riskSignals = [...interpSignals, ...selfSignals];
+  const flagged = isHighRiskElement(element, elAssessment);
 
   // Filter
   if (filterCategory !== "all" && element.category !== filterCategory) return null;
@@ -130,6 +140,12 @@ function ElementCard({ element, filterCategory, filterStatus }: ElementCardProps
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 font-medium flex items-center gap-0.5">
                 <FileText className="w-2.5 h-2.5" />
                 Written Guidance Req.
+              </span>
+            )}
+            {flagged && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-fuchsia-100 text-fuchsia-700 font-medium flex items-center gap-0.5">
+                <ShieldAlert className="w-2.5 h-2.5" />
+                Inspector Watch
               </span>
             )}
             {currentStatus !== "not-assessed" && (
@@ -167,6 +183,22 @@ function ElementCard({ element, filterCategory, filterStatus }: ElementCardProps
               </div>
             )}
           </div>
+
+          {/* Inspector Watch alerts */}
+          {riskSignals.length > 0 && (
+            <div className="rounded-lg border border-fuchsia-200 bg-fuchsia-50 p-3 space-y-2">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-fuchsia-700">
+                <ShieldAlert className="w-3.5 h-3.5" />
+                Where an assessor may catch you out
+              </div>
+              {riskSignals.map((signal, i) => (
+                <div key={i} className="text-xs text-fuchsia-800 leading-relaxed pl-1 border-l-2 border-fuchsia-300">
+                  <span className="font-semibold">{signal.tag}: </span>
+                  {signal.message}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Status Selection */}
           <div>
@@ -318,6 +350,9 @@ export default function ChapterAssessment({ chapterId }: { chapterId: string }) 
   const coreCount = allElements.filter((e) => e.category === "CORE").length;
   const commitmentCount = allElements.filter((e) => e.category === "Commitment").length;
   const achievementCount = allElements.filter((e) => e.category === "Achievement").length;
+  const highRiskCount = allElements.filter((e) =>
+    isHighRiskElement(e, assessment.session.elements[e.id])
+  ).length;
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -374,6 +409,16 @@ export default function ChapterAssessment({ chapterId }: { chapterId: string }) 
           <span className="font-semibold">CORE elements</span> are mandatory and assessed at every NABH assessment. Achieving 100% CORE compliance is essential for accreditation. Elements marked with <span className="font-semibold">Written Guidance Required (*)</span> need documented policies/SOPs.
         </div>
       </div>
+
+      {/* Inspector Watch summary */}
+      {highRiskCount > 0 && (
+        <div className="bg-fuchsia-50 border border-fuchsia-200 rounded-xl p-3 flex gap-2">
+          <ShieldAlert className="w-4 h-4 text-fuchsia-600 flex-shrink-0 mt-0.5" />
+          <div className="text-xs text-fuchsia-800">
+            <span className="font-semibold">{highRiskCount} of {allElements.length} elements</span> here are flagged as <span className="font-semibold">Inspector Watch</span> — CORE gaps, missing evidence, or areas typically verified by staff interview, walk-through, or record sampling rather than paperwork alone. Expand any element and look for the <span className="font-semibold">"Where an assessor may catch you out"</span> note before the visit.
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex gap-2 flex-wrap items-center">

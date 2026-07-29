@@ -1,5 +1,6 @@
 import { useApp } from "../App";
 import { chapters } from "../data/standards";
+import { isHighRiskElement } from "../lib/inspectorRisk";
 import {
   Eye,
   CheckCircle2,
@@ -13,6 +14,7 @@ import {
   Shield,
   Activity,
   ClipboardList,
+  ShieldAlert,
 } from "lucide-react";
 
 const chapterGradients: Record<string, string> = {
@@ -70,6 +72,16 @@ export default function Dashboard() {
   };
 
   const rc = readinessConfig[readiness.color];
+
+  const chapterRisk = chapters
+    .map((ch) => {
+      const els = ch.standards.flatMap((s) => s.elements);
+      const count = els.filter((e) => isHighRiskElement(e, session.elements[e.id])).length;
+      return { chapter: ch, count, total: els.length };
+    })
+    .filter((r) => r.count > 0)
+    .sort((a, b) => b.count - a.count);
+  const totalHighRisk = chapterRisk.reduce((sum, r) => sum + r.count, 0);
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -151,6 +163,36 @@ export default function Dashboard() {
           bg="bg-amber-50"
         />
       </div>
+
+      {/* Inspector Watch panel */}
+      {totalHighRisk > 0 && (
+        <div className="bg-white rounded-2xl border border-fuchsia-200 p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-fuchsia-600" />
+              <span className="text-sm font-semibold text-gray-700">Inspector Watch — where NCs usually happen</span>
+            </div>
+            <span className="text-xs text-gray-400">{totalHighRisk} elements flagged</span>
+          </div>
+          <p className="text-xs text-gray-500 mb-4">
+            These are CORE gaps, elements marked compliant without evidence, and requirements
+            historically verified by staff interview, walk-through, or record sampling — not
+            just paperwork. Review these before your next assessment.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {chapterRisk.slice(0, 6).map(({ chapter, count, total }) => (
+              <button
+                key={chapter.id}
+                onClick={() => navigate("assessment", chapter.id)}
+                className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-fuchsia-100 bg-fuchsia-50 hover:bg-fuchsia-100 transition-colors text-left"
+              >
+                <span className="text-xs font-medium text-fuchsia-800 truncate">{chapter.code}</span>
+                <span className="text-[10px] font-bold text-fuchsia-600 flex-shrink-0">{count}/{total}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Progress bar overall */}
       {stats.assessedElements > 0 && (
